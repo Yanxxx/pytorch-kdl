@@ -1,4 +1,11 @@
-# kdl_parser
+# Pytorch KDL environment setup
+This repository is setup for the GPU version pytorch combine PyKDL libary to do the robot manipulation task. 
+
+Pytorch docker is from [pytorch](https://hub.docker.com/r/pytorch/pytorch).
+
+The KDL library is compiled following the kdl repository from [github](https://github.com/orocos/orocos_kinematics_dynamics).
+
+## kdl_parser
 Provides basic functionality of [kdl_parser_py](https://github.com/ros/kdl_parser) without ROS dependencies. Includes [urdf_parser_py](https://github.com/ros/urdf_parser_py) for that purpose.
 
 ## Installation
