@@ -11,6 +11,7 @@ RUN apt-get update && apt-get -y install python-pydot python-pydot-ng graphviz
 
 # jupyter installation 
 RUN pip install jupyter
+RUN pip install lxml
 
 # pytorch vision repository 
 RUN pip install torchvision
