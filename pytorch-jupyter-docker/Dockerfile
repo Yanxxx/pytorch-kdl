@@ -16,3 +16,5 @@ RUN pip install lxml
 # pytorch vision repository 
 RUN pip install torchvision
 
+# lxml for parsing urdf file
+RUN pip install lxml
