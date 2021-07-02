@@ -16,5 +16,12 @@ RUN pip install lxml
 # pytorch vision repository 
 RUN pip install torchvision
 
-# lxml for parsing urdf file
-RUN pip install lxml
+# tensor board and opencv python
+RUN pip install tensorboard
+RUN pip install opencv-python
+
+RUN apt-get update && apt-get install -y python3-opencv
+RUN apt install -y libgl1-mesa-glx
+
+# matplotlib module
+RUN python -m pip install -U matplotlib
