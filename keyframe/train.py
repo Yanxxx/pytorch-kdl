@@ -21,51 +21,77 @@ import torch.nn as nn
 
 
 def main():
+    pre_process = False
     device = utils.selectDevice()
-    
-    params = {'batch_size': 64,
-              'shuffle': True,
-              'num_workers': 1}
     
     rot, t = utils.camTrans()
     
-    model = Keyframe(rot, t).to(device)
-    
-    data_path = '/workspace/datasets/key_frame_identifier/block-insertion-test/'
-    
+    model = Keyframe(rot.to(device), t.to(device)).to(device)    
+    # preparing dataset
+    print('preparing dataset')
+    data_path = '/workspace/datasets/key_frame_identifier/block-insertion-test/'    
     training_set = dataset(data_path)
+    if pre_process:
+        training_set.preProcess()
+        
+    params = {'batch_size': 64,
+              'shuffle': True,
+              'num_workers': 16}    
     train_generator = torch.utils.data.DataLoader(training_set, **params)
-    
+    # setup loss fucntion
+    print('setting up loss function')
     criterion = nn.MSELoss()
+    # setup optimizer 
+    print('setup optimizer')
+    learning_rate = 1e-3
     optimizer = torch.optim.RMSprop(model.parameters(), lr=learning_rate)
+    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[20000,60000, 120000], gamma=0.1)
 
+    # maximum epochs
     max_epochs = 200000
-    
+#    max_epochs = 0
+    epoch = 0
+    checkpoint = { 
+    'epoch': epoch,
+    'model': model.state_dict(),
+    'optimizer': optimizer.state_dict(),
+    'lr_sched': scheduler}
+
+    loss_val = []
+    # start the training
+    print('starting the training process')
     for epoch in range(max_epochs):
 #        name = f'{FLAGS.task}-{FLAGS.agent}-{FLAGS.n_demos}-{train_run}'
         
-        curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-        log_dir = os.path.join(data_path, 'logs', curr_time, 'train')
+#        curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+#        log_dir = os.path.join(data_path, 'logs', curr_time, 'train')
+#
         
         for data, depth, gt in train_generator:
+#            print(data.shape, depth.shape, gt.shape)
+            data = data.to(device)
+            depth = depth.to(device)
+            gt = gt.to(device)
+#            print(type(data))
             ps = model(data, depth)
             loss = criterion(ps, gt)
-            if t % 100 == 99:
-                print(t, loss.item())
-            
+#            print(t, loss.item())    
+#            if t % 100 == 99:
+#                print(t, loss.item())            
             optimizer.zero_grad()
-
-            loss.backward()
-            
+            loss.backward()            
             optimizer.step()
-            
-            
-            
-            
-            
-            
 
-    
-    
+        print('epoch: ', epoch, ', lose: ', loss.item())
+        loss_val.append(loss.item())
+        scheduler.step()
+        
+        if epoch % 1000 == 999:
+            torch.save(checkpoint, 'checkpoint.pth')
+            with open('loss.txt', 'a') as f:
+                f.write("\n".join(map(str, loss_val)))
+            loss_val = []
 
-    
+            
+if __name__ == '__main__':
+    main()

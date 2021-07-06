@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import torch.nn as nn
-from utils import FeatureNet, Transformation, PoseRegression
+from submodules import FeatureNet, Transformation, PoseRegression
 from extended_spatial_softmax import ExtendedSpatialSoftargMax
 
 
@@ -35,9 +35,13 @@ class Keyframe(nn.Module):
               
     def forward(self, data, depth):
         output = self.feature(data)
+#        print(output.shape)
         output = self.extended_spatial_max(output, depth)
+#        print(output.shape)
         output = self.transform(output)
+#        print(output.shape)
         output = self.pose_regress(output)
+#        print(output.shape)
         return output
     
     
