@@ -75,18 +75,16 @@ class Transformation(nn.Module):
         self.br = torch.transpose(rotation, 1, 0)
         self.bt = torch.matmul(self.br, translation)
 
-    @staticmethod
-    def forward(self, data):
-        size = list(data.shape)
-        data = data.reshape(size[0], 3, size[1] // 3)
-        data = data.permute(1, 2, 0)
-        reprojected_pt = torch.matmul(self.rotation,torch.transpose(data,1,0)) + self.translation#[:,None]
-        reprojected_pt = reprojected_pt.permute(2, 0, 1)
-        reprojected_pt = reprojected_pt.reshape(size[0], size[1])
+    def forward(self, data, batch_size, channel):
+#        print('Transformation network input: ', data.shape)
+        reprojected_pt = torch.matmul(self.rotation, data) + self.translation#[:,None]  
+        
+        r = torch.reshape(torch.transpose(reprojected_pt, 1, 0), (1, channel * batch_size * 3))
+        r = torch.reshape(r, (channel* 3, batch_size))
+        reprojected_pt = torch.transpose(r, 1, 0)
         
         return reprojected_pt
     
-    @staticmethod
     def backward(self, data):
         size = list(data.shape)
         data = data.reshape(size[0], 3, size[1] // 3)

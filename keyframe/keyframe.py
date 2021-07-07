@@ -36,11 +36,13 @@ class Keyframe(nn.Module):
               
     def forward(self, data, depth):
         output = self.feature(data)
+        batch_size = data.shape[0]
+        channel = output.shape[1]
 #        print(output.shape)
         output = self.extended_spatial_max(output, depth)
 #        torch.save(output, 'coords')
-        print(output.shape)
-        output = self.transform(output)
+#        print('extended spatial soft(arg)max output: ', output.shape)
+        output = self.transform(output, batch_size, channel)
 #        print(output.shape)
         output = self.pose_regress(output)
 #        print(output.shape)
