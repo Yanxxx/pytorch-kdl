@@ -107,8 +107,12 @@ class dataset(Dataset):
         selected_frame = r.randint(1, len(files) - 1)
 #        if len(files) <= selected_frame:
 #            print(len(files), selected_frame)
+#        print(files[selected_frame])
         d = torch.load(join(self.data_dir, 'cache', folder, files[selected_frame]))
-        return d['data'], d['depth'], d['gt']
+#        return d['data'], d['depth'], d['gt']
+        gt = d['gt']
+        gt = gt[14:]
+        return d['data'], d['depth'], gt
 
         
     def __getitem_backup__(self, idx):
@@ -156,6 +160,7 @@ class dataset(Dataset):
              np.array(action[selected_frame]['pose'][1])),axis=0)
         
         gt = np.concatenate((x,y,z),axis=0)
+#        gt = x
         gt = torch.Tensor(gt)
 #        gt = torch.Tensor(gt).reshape([1,gt.shape[0]])
         return gt

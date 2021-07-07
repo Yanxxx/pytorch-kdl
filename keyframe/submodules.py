@@ -36,8 +36,8 @@ class FeatureNet(nn.Sequential):
           nn.Conv2d(256, 256, 3),
           nn.BatchNorm2d(256),
           nn.ReLU(),    
-          nn.Conv2d(256, 196, 1),
-          nn.BatchNorm2d(196),
+          nn.Conv2d(256, 16, 1),
+          nn.BatchNorm2d(16),
           nn.ReLU(),     
         )
     
@@ -50,16 +50,15 @@ class PoseRegression(nn.Sequential):
     def __init__(self):
         super().__init__()
         self.model = nn.Sequential(
-          nn.Linear(588, 294),
-          nn.BatchNorm1d(294),
-          nn.Linear(294, 147),
-          nn.BatchNorm1d(147),
+          nn.Linear(48, 96),
+          nn.BatchNorm1d(96),
+          nn.Linear(96, 48),
+          nn.BatchNorm1d(48),
           nn.ReLU(),
-          nn.Linear(147, 42),
-          nn.BatchNorm1d(42),
-          nn.ReLU(),
-          nn.Linear(42, 21),
-          nn.BatchNorm1d(21),
+#          nn.Linear(42, 21),
+#          nn.BatchNorm1d(21),
+          nn.Linear(48, 7),
+          nn.BatchNorm1d(7),
           nn.Tanh()
         )
     
@@ -75,7 +74,8 @@ class Transformation(nn.Module):
         self.translation = translation
         self.br = torch.transpose(rotation, 1, 0)
         self.bt = torch.matmul(self.br, translation)
-        
+
+    @staticmethod
     def forward(self, data):
         size = list(data.shape)
         data = data.reshape(size[0], 3, size[1] // 3)
@@ -86,8 +86,15 @@ class Transformation(nn.Module):
         
         return reprojected_pt
     
+    @staticmethod
     def backward(self, data):
-        reprojected_pt = torch.matmul(self.br,data) + self.bt#[:,None]
+        size = list(data.shape)
+        data = data.reshape(size[0], 3, size[1] // 3)
+        data = data.permute(1, 2, 0)
+        reprojected_pt = torch.matmul(self.br,torch.transpose(data,1,0)) + self.bt#[:,None]
+        reprojected_pt = reprojected_pt.permute(2, 0, 1)
+        reprojected_pt = reprojected_pt.reshape(size[0], size[1])
+        
         return reprojected_pt
         
 

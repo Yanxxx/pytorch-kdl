@@ -18,6 +18,8 @@ import utils
 import datetime
 import torch
 import torch.nn as nn
+from os import mkdir, getcwd
+from os.path import join
 
 
 def main():
@@ -45,7 +47,7 @@ def main():
     print('setup optimizer')
     learning_rate = 1e-3
     optimizer = torch.optim.RMSprop(model.parameters(), lr=learning_rate)
-    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[20000,60000, 120000], gamma=0.1)
+    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[2000,3000, 6000], gamma=0.1)
 
     # maximum epochs
     max_epochs = 200000
@@ -60,6 +62,11 @@ def main():
     loss_val = []
     # start the training
     print('starting the training process')
+    curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    model_path = join(getcwd(), 'checkpoints', curr_time)
+    mkdir(model_path)
+    loss_path = join(getcwd(), 'loss', curr_time)
+    mkdir(loss_path)
     for epoch in range(max_epochs):
 #        name = f'{FLAGS.task}-{FLAGS.agent}-{FLAGS.n_demos}-{train_run}'
         
@@ -74,6 +81,9 @@ def main():
             gt = gt.to(device)
 #            print(type(data))
             ps = model(data, depth)
+            
+#            print(gt.shape, ps.shape)
+            
             loss = criterion(ps, gt)
 #            print(t, loss.item())    
 #            if t % 100 == 99:
@@ -82,13 +92,16 @@ def main():
             loss.backward()            
             optimizer.step()
 
-        print('epoch: ', epoch, ', lose: ', loss.item())
+        print('epoch: ', epoch, ', loss: ', loss.item())
         loss_val.append(loss.item())
         scheduler.step()
         
-        if epoch % 1000 == 999:
-            torch.save(checkpoint, 'checkpoint.pth')
-            with open('loss.txt', 'a') as f:
+        if epoch % 1000 == 0:
+            saved_model = 'checkpoint-{}.pth'.format(epoch)
+#            with open(join(getcwd(), model_path, saved_model), 'rb') as f:
+#                torch.save(checkpoint, f)
+            torch.save(checkpoint, join(getcwd(), model_path, saved_model))
+            with open(join(getcwd(), loss_path, 'loss.txt'), 'a') as f:
                 f.write("\n".join(map(str, loss_val)))
             loss_val = []
 

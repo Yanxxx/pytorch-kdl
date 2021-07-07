@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import torch
 import torch.nn as nn
 from submodules import FeatureNet, Transformation, PoseRegression
 from extended_spatial_softmax import ExtendedSpatialSoftargMax
@@ -21,7 +22,7 @@ from extended_spatial_softmax import ExtendedSpatialSoftargMax
 
 class Keyframe(nn.Module):
     def __init__(self, rotation, translation, spatial_height=31, 
-                 spatial_weight=21, spatial_channel=196):
+                 spatial_weight=21, spatial_channel=16):
         super(Keyframe, self).__init__()
         self.feature = FeatureNet()
 #        self.extended_spatial_max = ExtendedSpatialSoftargMax(31,21,196)
@@ -37,7 +38,8 @@ class Keyframe(nn.Module):
         output = self.feature(data)
 #        print(output.shape)
         output = self.extended_spatial_max(output, depth)
-#        print(output.shape)
+#        torch.save(output, 'coords')
+        print(output.shape)
         output = self.transform(output)
 #        print(output.shape)
         output = self.pose_regress(output)

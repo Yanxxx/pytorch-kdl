@@ -29,11 +29,12 @@ class ExtendedSpatialSoftargMax(nn.Module):
         self.camera_intrinsic = torch.Tensor([450, 0 , 320, 0, 450, 240, 0, 0, 1])
         self.x = self.camera_intrinsic[2]
         self.y = self.camera_intrinsic[5]
+
         
     def rcbaseline(self, batch_size):
         baseline = torch.arange(0,batch_size) * 640 *480
-        baseline = torch.transpose(baseline.repeat(196,1),1,0)
-        self.baseline = baseline.reshape(batch_size * 196, 1).to('cuda:0')
+        baseline = torch.transpose(baseline.repeat(self.channel,1),1,0)
+        self.baseline = baseline.reshape(batch_size * self.channel, 1).to('cuda:0')
         
 
     def forward(self, feature, depth):
@@ -73,8 +74,8 @@ class ExtendedSpatialSoftargMax(nn.Module):
         z_prime_x = z / 900 * image_width
         z_prime_y = z / 900 * image_height
         
-        
-        result = torch.cat([expected_x * z_prime_x, expected_y * z_prime_y, z], 1)
+        print('*********************z shape', z.shape)
+        result = torch.cat([expected_x * z_prime_x, expected_y * z_prime_y, z], 0)
 #        print('extended', result.shape)
         feature_keypoints = result.view(-1, self.channel*3)
 
