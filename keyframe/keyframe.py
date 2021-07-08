@@ -15,34 +15,44 @@
 
 import torch
 import torch.nn as nn
-from submodules import FeatureNet, Transformation, PoseRegression
-from extended_spatial_softmax import ExtendedSpatialSoftargMax
+from submodules import FeatureNet, PoseRegression
+from extended_spatial_softmax_overload_autograd import ExtendedSpatialSoftmax
 
 
 
 class Keyframe(nn.Module):
-    def __init__(self, rotation, translation, spatial_height=31, 
+    def __init__(self, rotation, translation, 
+                 image_height,
+                 image_width,
+                 camera_intrinsic=[450, 0 , 320, 0, 450, 240, 0, 0, 1],
+                 spatial_height=31, 
                  spatial_weight=21, spatial_channel=16):
         super(Keyframe, self).__init__()
         self.feature = FeatureNet()
 #        self.extended_spatial_max = ExtendedSpatialSoftargMax(31,21,196)
-        self.extended_spatial_max = ExtendedSpatialSoftargMax(spatial_height, 
-                                                              spatial_weight, 
-                                                              spatial_channel)
-        self.transform = Transformation(rotation, translation)
+#        self.extended_spatial_max = ExtendedSpatialSoftargMax(spatial_height, 
+#                                                              spatial_weight, 
+#                                                              spatial_channel)
+#        self.transform = Transformation(rotation, translation)
+        self.extended_spatial_softmax = ExtendedSpatialSoftmax(spatial_height,
+                                                               spatial_weight,
+                                                               spatial_channel,
+                                                               image_height,
+                                                               image_width,
+                                                               rotation, 
+                                                               translation, 
+                                                               camera_intrinsic)
         self.pose_regress = PoseRegression()
         self.rotation = rotation
         self.translation = translation
               
     def forward(self, data, depth):
         output = self.feature(data)
-        batch_size = data.shape[0]
-        channel = output.shape[1]
 #        print(output.shape)
-        output = self.extended_spatial_max(output, depth)
+        output = self.extended_spatial_softmax(output, depth)
 #        torch.save(output, 'coords')
 #        print('extended spatial soft(arg)max output: ', output.shape)
-        output = self.transform(output, batch_size, channel)
+#        output = self.transform(output, batch_size, channel)
 #        print(output.shape)
         output = self.pose_regress(output)
 #        print(output.shape)

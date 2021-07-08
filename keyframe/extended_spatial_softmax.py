@@ -81,3 +81,6 @@ class ExtendedSpatialSoftargMax(nn.Module):
 #        feature_keypoints = result.view(-1, self.channel*3)
 
         return feature_keypoints
+
+    def backward(self, error):
+        pass

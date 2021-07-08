@@ -28,7 +28,7 @@ def main():
     
     rot, t = utils.camTrans()
     
-    model = Keyframe(rot.to(device), t.to(device)).to(device)    
+    model = Keyframe(rot.to(device), t.to(device), 480, 640).to(device)    
     # preparing dataset
     print('preparing dataset')
     data_path = '/workspace/datasets/key_frame_identifier/block-insertion-test/'    
