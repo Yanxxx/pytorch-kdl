@@ -15,35 +15,21 @@
 
 import torch
 import torch.nn as nn
-from submodules import FeatureNet, PoseRegression
+from submodules import FeatureNet, PoseRegression, PoseRegressionNaive
 from extended_spatial_softmax_overload_autograd import ExtendedSpatialSoftmax
 
 
 
 class NaiveAttention(nn.Module):
+
     def __init__(self):
-        super(Keyframe, self).__init__()
+        super(NaiveAttention, self).__init__()
         self.feature = FeatureNet()
-#        self.extended_spatial_max = ExtendedSpatialSoftargMax(31,21,196)
-#        self.extended_spatial_max = ExtendedSpatialSoftargMax(spatial_height, 
-#                                                              spatial_weight, 
-#                                                              spatial_channel)
-#        self.transform = Transformation(rotation, translation)
-        
-        self.pose_regress = PoseRegression()
-        self.rotation = rotation
-        self.translation = translation
+        self.pose_regress = PoseRegressionNaive()
               
-    def forward(self, data, depth):
+    def forward(self, data):
         output = self.feature(data)
-#        print(output.shape)
-        output = self.extended_spatial_softmax(output, depth)
-#        torch.save(output, 'coords')
-#        print('extended spatial soft(arg)max output: ', output.shape)
-#        output = self.transform(output, batch_size, channel)
-#        print(output.shape)
         output = self.pose_regress(output)
-#        print(output.shape)
         return output
     
     

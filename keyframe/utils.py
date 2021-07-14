@@ -19,7 +19,7 @@ import numpy as np
 
     
 def selectDevice():        
-    torch.cuda.is_available()    
+    print('check CUDA availbility ', torch.cuda.is_available())
     if torch.cuda.is_available():  
       dev = "cuda:0" 
     else:  

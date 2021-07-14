@@ -48,10 +48,10 @@ def main():
     print('setup optimizer')
     learning_rate = 1e-3
     optimizer = torch.optim.RMSprop(model.parameters(), lr=learning_rate)
-    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[2000,3000, 6000], gamma=0.1)
+    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[2000, 3000, 4000, 5000], gamma=0.1)
 
     # maximum epochs
-    max_epochs = 200000
+    max_epochs = 20000
 #    max_epochs = 0
     epoch = 0
     checkpoint = { 

@@ -152,3 +152,25 @@ class SpatialSoftmax(nn.Module):
         feature_keypoints = expected_xy.view(-1, self.channel*2)
 
         return feature_keypoints
+        
+
+class PoseRegressionNaive(nn.Sequential):
+  
+    def __init__(self):
+        super().__init__()
+        self.model = nn.Sequential(
+          nn.Linear(10416, 128),
+          nn.BatchNorm1d(128),
+          nn.Linear(128, 48),
+          nn.BatchNorm1d(48),
+          nn.ReLU(),
+#          nn.Linear(42, 21),
+#          nn.BatchNorm1d(21),
+          nn.Linear(48, 7),
+          nn.BatchNorm1d(7),
+          nn.Tanh()
+        )
+    
+    def forward(self, data):
+        data = data.view(-1, data.shape[1] * data.shape[2] * data.shape[3])
+        return self.model(data)
