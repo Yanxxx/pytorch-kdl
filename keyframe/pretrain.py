@@ -12,9 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from dataset import dataset
-from keyframe import Keyframe
-import tmp_utils as utils
+from dataset import dataset2D
+from PointAttension2D import PointAttension2D
+import utils
 import datetime
 import torch
 import torch.nn as nn
@@ -23,16 +23,16 @@ from os.path import join
 
 
 def main():
-    pre_process = True
+    pre_process = False
     device = utils.selectDevice()
     
     rot, t = utils.camTrans()
     
-    model = Keyframe(rot.to(device), t.to(device), 480, 640).to(device)    
+    model = PointAttension2D().to(device)    
     # preparing dataset
     print('preparing dataset')
     data_path = '/workspace/datasets/key_frame_identifier/block-insertion-test/'    
-    training_set = dataset(data_path)
+    training_set = dataset2D(data_path)
     if pre_process:
         training_set.preProcess()
         return
@@ -47,7 +47,7 @@ def main():
     # setup optimizer 
     print('setup optimizer')
     learning_rate = 1e-3
-    optimizer = torch.optim.RMSprop(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
     scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[2000,3000, 6000], gamma=0.1)
 
     # maximum epochs
@@ -70,21 +70,22 @@ def main():
     mkdir(loss_path)
     for epoch in range(max_epochs):
 #        name = f'{FLAGS.task}-{FLAGS.agent}-{FLAGS.n_demos}-{train_run}'
-        
 #        curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
 #        log_dir = os.path.join(data_path, 'logs', curr_time, 'train')
-#
         
-        for data, depth, gt in train_generator:
+        for data, gt in train_generator:
 #            print(data.shape, depth.shape, gt.shape)
+            data = data.permute(0, 3, 1, 2)
+            #print(data.shape)
             data = data.to(device)
-            depth = depth.to(device)
-            gt = gt.to(device)
+
+            gt = gt / torch.Tensor([320, 240])
+            # print(gt)
+            gt = gt.float().to(device)
 #            print(type(data))
-            ps = model(data, depth)
-            
-#            print(gt.shape, ps.shape)
-            
+            ps = model(data)
+            #print(gt.shape, ps.shape)
+
             loss = criterion(ps, gt)
 #            print(t, loss.item())    
 #            if t % 100 == 99:
@@ -96,7 +97,7 @@ def main():
         print('epoch: ', epoch, ', loss: ', loss.item())
         loss_val.append(loss.item())
         scheduler.step()
-        
+
         if epoch % 1000 == 0:
             saved_model = 'checkpoint-{}.pth'.format(epoch)
 #            with open(join(getcwd(), model_path, saved_model), 'rb') as f:

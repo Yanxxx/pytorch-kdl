@@ -7,7 +7,7 @@ import numpy as np
 class ExtendedSpatialSoftmax(nn.Module):
   
     def __init__(self, height, width, channel, temperature=None, camera_intrinsic=[450, 0 , 320, 0, 450, 240, 0, 0, 1],  data_format='NCHW'):
-        super(ExtendedSpatialSoftargMax, self).__init__()
+        super(ExtendedSpatialSoftmax, self).__init__()
         self.data_format = data_format
         self.height = height
         self.width = width
@@ -42,45 +42,36 @@ class ExtendedSpatialSoftmax(nn.Module):
         else:
             feature = feature.view(-1, self.height * self.width)
 
-#        print('**************flattened feature', feature.shape)
         softmax_attention = F.softmax(feature/self.temperature, dim=-1)
         expected_x = torch.sum(self.pos_x*softmax_attention, dim=1, keepdim=True)
         expected_y = torch.sum(self.pos_y*softmax_attention, dim=1, keepdim=True)
-        r_expected_x = torch.reshape(expected_x, (1, batch_size * self.channel))
-        r_expected_y = torch.reshape(expected_y, (1, batch_size * self.channel))
-#        print('coord', expected_x.shape, self.pos_x.shape)
-#        expected_xy = torch.cat([expected_x, expected_y], 1)
-#        print('spatial softmax', expected_xy.shape)
-#        feature_keypoints = expected_xy.view(-1, self.channel*2)
         image_height = depth.shape[3]
         image_width = depth.shape[2]
         flattened_depth = depth.view(-1, image_height * image_width)
 #        print('**************flattened depth', flattened_depth.shape)
         coord = expected_x * self.x - 1 + self.x + (expected_y * self.y + self.y - 1) * image_width
 #        print(coord.shape, self.baseline.shape)
-        coord = torch.reshape(torch.round(coord).long(), (batch_size, self.channel))
+        coord = torch.round(coord).long()
         Z = torch.take(flattened_depth, coord)
-        Z = torch.reshape(Z, (1, batch_size * self.channel))
-#        ix = torch.round(expected_x * image_width).long()
-#        iy = torch.round(expected_y * image_height).long()
-        
-#        z = depth[:, 0, ix, iy] 
-#        print('****************** depth dim',z.shape)
-#        z = z.view(-1, self.height*self.width)
-#        print('****************** depth dim',z.shape)
-        X = Z / self.f_x * image_width / 2 * r_expected_x
-        Y = Z / self.f_y * image_height / 2 * r_expected_y
-        
-#        result = torch.cat([X, Y, Z], 0)
-#        r = torch.reshape(torch.transpose(result, 1, 0), (1, X.shape[1] * 3))
-#        r = torch.reshape(r, (self.channel * 3, batch_size))
-#        feature_keypoints = torch.transpose(r, 1, 0)
-        
-        feature_keypoints = torch.cat([X, Y, Z], 0)
-#        print('extended', result.shape)
-#        feature_keypoints = result.view(-1, self.channel*3)
+        X = Z / self.f_x * image_width / 2 * expected_x
+        Y = Z / self.f_y * image_height / 2 * expected_y
+        xyz = torch.stack([X, Y, Z], 1).reshape((batch_size, 3, 1, self.channel))
+        return xyz
 
-        return feature_keypoints
 
-    def backward(self, error):
-        pass
+class Transformation(nn.Module):
+    
+    def __init__(self):
+        super(Transformation, self).__init__()
+        self.conv1 = torch.nn.Conv2d(3, 9, 1)
+        self.conv2 = torch.nn.Conv2d(9, 3, 1)
+        
+
+    def forward(self, data):
+        output = self.conv1(data)
+        output = self.conv2(output)
+        size = (output.shape[0], output.shape[1] * output.shape[3])
+        return output.squeeze().transpose(2,1).reshape(size)
+#        return self.conv2(output)
+    
+
