@@ -13,7 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from dataset import dataset
-from keyframe import Keyframe
+#from keyframe import Keyframe
+from attention import Attention
 import tmp_utils as utils
 import datetime
 import torch
@@ -23,12 +24,12 @@ from os.path import join
 
 
 def main():
-    pre_process = True
+    pre_process = False
     device = utils.selectDevice()
     
     rot, t = utils.camTrans()
     
-    model = Keyframe(rot.to(device), t.to(device), 480, 640).to(device)    
+    model = Attention(rot.to(device), t.to(device), 480, 640).to(device)    
     # preparing dataset
     print('preparing dataset')
     data_path = '/workspace/datasets/key_frame_identifier/block-insertion-test/'    
