@@ -9,7 +9,7 @@ import tmp_utils as utils
 device = utils.selectDevice()
 
 class ExtendedSpatialSoftmax(nn.Module):
-    
+
     def __init__(self, height, width, channel, image_height, image_width, 
                  rotation, translation, 
                  camera_intrinsic=[450, 0 , 320, 0, 450, 240, 0, 0, 1],
@@ -37,6 +37,7 @@ class ExtendedSpatialSoftmax(nn.Module):
         return output
 
 class SpatialSoftmax(nn.Module):
+
     def __init__(self, height, width, channel, temperature=None, data_format='NCHW'):
         super(SpatialSoftmax, self).__init__()
         self.data_format = data_format

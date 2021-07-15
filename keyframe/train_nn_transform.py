@@ -104,6 +104,7 @@ def main():
 #                torch.save(checkpoint, f)
             torch.save(checkpoint, join(getcwd(), model_path, saved_model))
             with open(join(getcwd(), loss_path, 'loss.txt'), 'a') as f:
+                f.write('\n')
                 f.write("\n".join(map(str, loss_val)))
             loss_val = []
 
