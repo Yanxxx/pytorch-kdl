@@ -34,7 +34,8 @@ import math
 
 
 class dataset(Dataset):
-    def __init__(self, data_dir, preprocess=False):
+    def __init__(self, data_dir, set_range=[0, 0.75], preprocess=False):
+        self.set_range = set_range
         self.data_dir = data_dir
         self.mean = [0.485, 0.456, 0.406] 
         self.std = [0.229, 0.224, 0.225]
@@ -55,7 +56,6 @@ class dataset(Dataset):
             self.loaddata()
         else:
             self.pre_process()
-        
 #        with open(join(data_dir, 'frames'), 'rb') as f:
 #            self.frames = pickle.load(f)
     def loaddata(self):
@@ -66,7 +66,10 @@ class dataset(Dataset):
         self.targets = []
         self.objects = []
         self.robot_ees = []
-        for count, filename in enumerate(files):
+        start = int(len(files) * self.set_range[0])
+        end = int(len(files) * self.set_range[1])
+        for count in range(start, end + 1):
+            filename = files[count]
             filename = join(self.data_dir, 'data', filename)
             print('loading file ', filename)
             with open(filename, 'rb') as f:
@@ -134,7 +137,8 @@ class dataset(Dataset):
         t = torch.Tensor(t)
         o = torch.Tensor(o)
         e = torch.Tensor(e)
-        return color, depth, t, o, e
+        
+        return color, depth, torch.cat((t, o , e), 1)
     
     def input_process(self, image, depth, dsize=(160, 120)):
         color = self.image_process(image, dsize)

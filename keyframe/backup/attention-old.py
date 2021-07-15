@@ -20,14 +20,14 @@ from extended_spatial_softmax_overload_autograd import ExtendedSpatialSoftmax
 
 
 
-class Keyframe(nn.Module):
+class Attention(nn.Module):
     def __init__(self, rotation, translation, 
                  image_height,
                  image_width,
                  camera_intrinsic=[450, 0 , 320, 0, 450, 240, 0, 0, 1],
                  spatial_height=31, 
                  spatial_weight=21, spatial_channel=16):
-        super(Keyframe, self).__init__()
+        super(Attention, self).__init__()
         self.feature = FeatureNet()
 #        self.extended_spatial_max = ExtendedSpatialSoftargMax(31,21,196)
 #        self.extended_spatial_max = ExtendedSpatialSoftargMax(spatial_height, 

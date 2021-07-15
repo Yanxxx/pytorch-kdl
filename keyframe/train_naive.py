@@ -23,7 +23,6 @@ from os.path import join
 
 
 def main():
-    pre_process = False
     device = utils.selectDevice()
     
     rot, t = utils.camTrans()
@@ -33,14 +32,13 @@ def main():
     print('preparing dataset')
     data_path = '/workspace/datasets/key_frame_identifier/block-insertion-test/'    
     training_set = dataset(data_path)
-    if pre_process:
-        training_set.preProcess()
-        return
+    validating_set = dataset(data_path, [0.76, 1])
         
     params = {'batch_size': 64,
               'shuffle': True,
               'num_workers': 16}    
     train_generator = torch.utils.data.DataLoader(training_set, **params)
+    validate_generator = torch.utils.data.DataLoader(validating_set)
     # setup loss fucntion
     print('setting up loss function')
     criterion = nn.MSELoss()
@@ -51,16 +49,16 @@ def main():
     scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[2000, 3000, 4000, 5000], gamma=0.1)
 
     # maximum epochs
-    max_epochs = 20000
-#    max_epochs = 0
+    max_epochs = 10000
     epoch = 0
     checkpoint = { 
     'epoch': epoch,
     'model': model.state_dict(),
     'optimizer': optimizer.state_dict(),
     'lr_sched': scheduler}
-
     loss_val = []
+    valid_loss = []
+    
     # start the training
     print('starting the training process')
     curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
@@ -69,43 +67,44 @@ def main():
     loss_path = join(getcwd(), 'loss', curr_time)
     mkdir(loss_path)
     for epoch in range(max_epochs):
-#        name = f'{FLAGS.task}-{FLAGS.agent}-{FLAGS.n_demos}-{train_run}'
         
-#        curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-#        log_dir = os.path.join(data_path, 'logs', curr_time, 'train')
-#
-        
+        model.train()
         for data, depth, gt in train_generator:
-#            print(data.shape, depth.shape, gt.shape)
             data = data.to(device)
-            depth = depth.to(device)
+            depth = depth.to(device)            
             gt = gt.to(device)
-#            print(type(data))
-            ps = model(data)
-            
-#            print(gt.shape, ps.shape)
-            
-            loss = criterion(ps, gt)
-#            print(t, loss.item())    
-#            if t % 100 == 99:
-#                print(t, loss.item())            
+            ps = model(data)            
+            loss = criterion(ps, gt)       
             optimizer.zero_grad()
             loss.backward()            
             optimizer.step()
-
-        print('epoch: ', epoch, ', loss: ', loss.item())
-        loss_val.append(loss.item())
-        scheduler.step()
-        
+        tl = loss.item()
+        loss_val.append(tl)
+                
+        model.eval()        
+        for data, depth, gt in validate_generator:
+            data = data.to(device)
+            depth = depth.to(device)
+            gt = gt.to(device)
+            
+            loss = criterion(ps, gt)
+            vl = loss.item()
+            valid_loss.append(vl)
+            
         if epoch % 1000 == 0:
             saved_model = 'checkpoint-{}.pth'.format(epoch)
-#            with open(join(getcwd(), model_path, saved_model), 'rb') as f:
-#                torch.save(checkpoint, f)
             torch.save(checkpoint, join(getcwd(), model_path, saved_model))
-            with open(join(getcwd(), loss_path, 'loss.txt'), 'a') as f:
+            with open(join(getcwd(), loss_path, 'navie-train-loss.txt'), 'a') as f:
                 f.write('\n')
                 f.write("\n".join(map(str, loss_val)))
             loss_val = []
+            with open(join(getcwd(), loss_path, 'navie-validate-loss.txt'), 'a') as f:
+                f.write('\n')
+                f.write("\n".join(map(str, valid_loss)))
+                valid_loss = []
+            
+        print('epoch: ', epoch, ', train-loss: ', tl, 'validate-loss', vl)
+        scheduler.step()
 
             
 if __name__ == '__main__':
