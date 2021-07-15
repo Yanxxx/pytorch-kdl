@@ -16,8 +16,6 @@
 import torch
 import torch.nn as nn
 from submodules import FeatureNet, PoseRegression, PoseRegressionNaive
-from extended_spatial_softmax_overload_autograd import ExtendedSpatialSoftmax
-
 
 
 class NaiveAttention(nn.Module):

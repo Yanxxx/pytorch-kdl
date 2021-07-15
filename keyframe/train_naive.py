@@ -30,15 +30,17 @@ def main():
     model = NaiveAttention().to(device)
     # preparing dataset
     print('preparing dataset')
-    data_path = '/workspace/datasets/key_frame_identifier/block-insertion-test/'    
-    training_set = dataset(data_path)
-    validating_set = dataset(data_path, [0.76, 1])
+    data_path = '/workspace/datasets/block-insertion-test/'    
+    print('loading train dataset.')
+    training_set = dataset(data_path)#, [0, 0.1])
+    print('loading validate dataset.')
+    validating_set = dataset(data_path, [0.75, 1])
         
     params = {'batch_size': 64,
               'shuffle': True,
               'num_workers': 16}    
     train_generator = torch.utils.data.DataLoader(training_set, **params)
-    validate_generator = torch.utils.data.DataLoader(validating_set)
+    validate_generator = torch.utils.data.DataLoader(validating_set, **params)
     # setup loss fucntion
     print('setting up loss function')
     criterion = nn.MSELoss()
@@ -73,7 +75,7 @@ def main():
             data = data.to(device)
             depth = depth.to(device)            
             gt = gt.to(device)
-            ps = model(data)            
+            ps = model(data)         
             loss = criterion(ps, gt)       
             optimizer.zero_grad()
             loss.backward()            
@@ -85,9 +87,11 @@ def main():
         for data, depth, gt in validate_generator:
             data = data.to(device)
             depth = depth.to(device)
-            gt = gt.to(device)
-            
+            gt = gt.to(device)  
+#            print('validate ', gt.shape)
+            ps = model(data)   
             loss = criterion(ps, gt)
+#            print('validate ps ', ps.shape)
             vl = loss.item()
             valid_loss.append(vl)
             

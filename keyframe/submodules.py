@@ -166,8 +166,8 @@ class PoseRegressionNaive(nn.Sequential):
           nn.ReLU(),
 #          nn.Linear(42, 21),
 #          nn.BatchNorm1d(21),
-          nn.Linear(48, 7),
-          nn.BatchNorm1d(7),
+          nn.Linear(48, 21),
+          nn.BatchNorm1d(21),
           nn.Tanh()
         )
     

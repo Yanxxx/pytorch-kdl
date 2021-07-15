@@ -51,7 +51,8 @@ class dataset(Dataset):
         self.object_files = listdir(self.object_folder)
         self.targ_files = listdir(self.targ_folder)
         
-        self.length = len(self.image_files)
+        self.length = int(len(self.image_files) * \
+			(self.set_range[1] - self.set_range[0]))
         if not preprocess:
             self.loaddata()
         else:
@@ -68,7 +69,8 @@ class dataset(Dataset):
         self.robot_ees = []
         start = int(len(files) * self.set_range[0])
         end = int(len(files) * self.set_range[1])
-        for count in range(start, end + 1):
+        
+        for count in range(start, end):
             filename = files[count]
             filename = join(self.data_dir, 'data', filename)
             print('loading file ', filename)
@@ -138,7 +140,7 @@ class dataset(Dataset):
         o = torch.Tensor(o)
         e = torch.Tensor(e)
         
-        return color, depth, torch.cat((t, o , e), 1)
+        return color, depth, t, o ,e
     
     def input_process(self, image, depth, dsize=(160, 120)):
         color = self.image_process(image, dsize)
@@ -168,7 +170,9 @@ class dataset(Dataset):
         t = self.targets[idx]
         o = self.objects[idx]
         e = self.robot_ees[idx]
-        return c, d, t, o, e
+        gt = torch.squeeze(torch.cat((t[None,:], o[None,:] , e[None,:]), 1))
+#        print(gt.shape)
+        return c, d, gt
 
     def loadfile(self, filename):
         with open(filename, 'rb') as f:
