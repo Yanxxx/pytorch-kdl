@@ -88,8 +88,8 @@ class FeatureNet2D(nn.Sequential):
           nn.Conv2d(256, 256, 3),
           nn.BatchNorm2d(256),
           nn.ReLU(),    
-          nn.Conv2d(256, 16, 1),
-          nn.BatchNorm2d(16),
+          nn.Conv2d(256, 96, 1),
+          nn.BatchNorm2d(96),
           nn.ReLU(),     
         )
     
@@ -101,13 +101,13 @@ class PoseRegression2D(nn.Sequential):
     def __init__(self):
         super().__init__()
         self.model = nn.Sequential(
-          nn.Linear(32, 48),
-          nn.BatchNorm1d(48),
+          nn.Linear(192, 96),
+          nn.BatchNorm1d(96),
           nn.ReLU(),
 #          nn.Linear(42, 21),
 #          nn.BatchNorm1d(21),
-          nn.Linear(48, 2),
-          nn.BatchNorm1d(2),
+          nn.Linear(96, 21),
+          nn.BatchNorm1d(21),
           nn.Tanh()
         )
     

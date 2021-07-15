@@ -20,7 +20,7 @@ from submodules import FeatureNet2D, PoseRegression2D, SpatialSoftmax
 
 
 class PointAttension2D(nn.Module):
-    def __init__(self, spatial_height=31, spatial_weight=21, spatial_channel=16):
+    def __init__(self, spatial_height=31, spatial_weight=21, spatial_channel=96):
         super(PointAttension2D, self).__init__()
         self.feature = FeatureNet2D()
         self.extended_spatial_softmax = SpatialSoftmax(spatial_height,
