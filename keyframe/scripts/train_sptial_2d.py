@@ -19,7 +19,7 @@ import datetime
 import torch
 import torch.nn as nn
 from os import mkdir, getcwd
-from os.path import join
+from os.path import join, dirname
 
 
 def main():
@@ -64,9 +64,9 @@ def main():
     # start the training
     print('starting the training process')
     curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-    model_path = join(getcwd(), 'checkpoints', curr_time)
+    model_path = join(dirname(getcwd()), 'checkpoints', curr_time)
     mkdir(model_path)
-    loss_path = join(getcwd(), 'loss', curr_time)
+    loss_path = join(dirname(getcwd()), '../', 'loss', curr_time)
     mkdir(loss_path)
     for epoch in range(max_epochs):
         

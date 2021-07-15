@@ -19,7 +19,7 @@ import datetime
 import torch
 import torch.nn as nn
 from os import mkdir, getcwd
-from os.path import join
+from os.path import join, dirname
 
 
 def main():
@@ -27,12 +27,12 @@ def main():
     
     rot, t = utils.camTrans()
     
-    model = Attention().to(device)
+    model = Attention(rot.to(device), t.to(device), 480, 640).to(device)
     # preparing dataset
     print('preparing dataset')
     data_path = '/workspace/datasets/block-insertion-test/'    
     print('loading train dataset.')
-    training_set = dataset(data_path)#, [0, 0.1])
+    training_set = dataset(data_path)#, [0, 0.02])
     print('loading validate dataset.')
     validating_set = dataset(data_path, [0.75, 1])
         
@@ -64,9 +64,9 @@ def main():
     # start the training
     print('starting the training process')
     curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-    model_path = join(getcwd(), 'checkpoints', curr_time)
+    model_path = join(dirname(getcwd()), 'checkpoints', curr_time)
     mkdir(model_path)
-    loss_path = join(getcwd(), 'loss', curr_time)
+    loss_path = join(dirname(getcwd()), 'loss', curr_time)
     mkdir(loss_path)
     for epoch in range(max_epochs):
         
@@ -75,7 +75,7 @@ def main():
             data = data.to(device)
             depth = depth.to(device)            
             gt = gt.to(device)
-            ps = model(data)         
+            ps = model(data, depth)         
             loss = criterion(ps, gt)       
             optimizer.zero_grad()
             loss.backward()            
@@ -89,7 +89,7 @@ def main():
             depth = depth.to(device)
             gt = gt.to(device)  
 #            print('validate ', gt.shape)
-            ps = model(data)   
+            ps = model(data, depth)   
             loss = criterion(ps, gt)
 #            print('validate ps ', ps.shape)
             vl = loss.item()

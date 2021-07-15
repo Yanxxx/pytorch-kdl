@@ -99,7 +99,7 @@ class PoseRegressionGeo(nn.Sequential):
     def __init__(self):
         super().__init__()
         self.model = nn.Sequential(
-          nn.Linear(192, 96),
+          nn.Linear(288, 96),
           nn.BatchNorm1d(96),
           nn.Linear(96, 96),
           nn.BatchNorm1d(96),

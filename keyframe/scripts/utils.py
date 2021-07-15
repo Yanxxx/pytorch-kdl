@@ -21,7 +21,7 @@ import numpy as np
 def selectDevice(device):        
     print('check CUDA availbility ', torch.cuda.is_available())
     if torch.cuda.is_available():  
-      dev = "cuda:{device}" 
+      dev = f'cuda:{device}'
     else:  
       dev = "cpu"      
     return torch.device(dev)  
