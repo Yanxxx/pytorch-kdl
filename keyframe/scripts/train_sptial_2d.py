@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from dataset import dataset
-from naive_method import NaiveAttention
+from PointAttension2D import PointAttension2D
 import utils as utils
 import datetime
 import torch
@@ -23,11 +23,11 @@ from os.path import join
 
 
 def main():
-    device = utils.selectDevice()
+    device = utils.selectDevice(0)
     
     rot, t = utils.camTrans()
     
-    model = NaiveAttention().to(device)
+    model = PointAttension2D().to(device)
     # preparing dataset
     print('preparing dataset')
     data_path = '/workspace/datasets/block-insertion-test/'    
@@ -72,6 +72,7 @@ def main():
         
         model.train()
         for data, depth, gt in train_generator:
+            data = data[:,:3, :, :]
             data = data.to(device)
             depth = depth.to(device)            
             gt = gt.to(device)
@@ -85,6 +86,7 @@ def main():
                 
         model.eval()        
         for data, depth, gt in validate_generator:
+            data = data[:,:3, :, :]
             data = data.to(device)
             depth = depth.to(device)
             gt = gt.to(device)  
@@ -98,11 +100,11 @@ def main():
         if epoch % 1000 == 0:
             saved_model = 'checkpoint-{}.pth'.format(epoch)
             torch.save(checkpoint, join(getcwd(), model_path, saved_model))
-            with open(join(getcwd(), loss_path, 'navie-train-loss.txt'), 'a') as f:
+            with open(join(getcwd(), '../', loss_path, 'spatial2d-train-loss.txt'), 'a') as f:
                 f.write('\n')
                 f.write("\n".join(map(str, loss_val)))
             loss_val = []
-            with open(join(getcwd(), loss_path, 'navie-validate-loss.txt'), 'a') as f:
+            with open(join(getcwd(), '../', loss_path, 'spatial2d-validate-loss.txt'), 'a') as f:
                 f.write('\n')
                 f.write("\n".join(map(str, valid_loss)))
                 valid_loss = []

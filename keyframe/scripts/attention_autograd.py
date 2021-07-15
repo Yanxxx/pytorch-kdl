@@ -15,7 +15,7 @@
 
 import torch
 import torch.nn as nn
-from submodules import FeatureNet, PoseRegression
+from submodules import FeatureNetGeo, PoseRegressionGeo
 from extended_spatial_softmax_ import ExtendedSpatialSoftmax, Transformation
 
 
@@ -26,9 +26,9 @@ class Attention(nn.Module):
                  image_width,
                  camera_intrinsic=[450, 0 , 320, 0, 450, 240, 0, 0, 1],
                  spatial_height=31, 
-                 spatial_weight=21, spatial_channel=16):
+                 spatial_weight=21, spatial_channel=96):
         super(Attention, self).__init__()
-        self.feature = FeatureNet()
+        self.feature = FeatureNetGeo()
 #        self.extended_spatial_max = ExtendedSpatialSoftargMax(31,21,196)
 #        self.extended_spatial_max = ExtendedSpatialSoftargMax(spatial_height, 
 #                                                              spatial_weight, 
@@ -38,7 +38,7 @@ class Attention(nn.Module):
                                                                spatial_weight,
                                                                spatial_channel)
         self.transform = Transformation()
-        self.pose_regress = PoseRegression()
+        self.pose_regress = PoseRegressionGeo()
         self.rotation = rotation
         self.translation = translation
               

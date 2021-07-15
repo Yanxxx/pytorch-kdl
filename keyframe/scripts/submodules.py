@@ -67,7 +67,52 @@ class PoseRegression(nn.Sequential):
     def forward(self, data):
         return self.model(data)
 
+class FeatureNetGeo(nn.Sequential):
+    def __init__(self):
+        super().__init__()
+        self.model = nn.Sequential(
+          nn.Conv2d(4, 32, 3),
+          nn.Conv2d(32, 32, 3),
+          nn.Conv2d(32, 32, 3),
+          nn.BatchNorm2d(32),
+          nn.ReLU(),
+          nn.Conv2d(32, 64, 3, stride=2),
+          nn.Conv2d(64, 128, 3),
+          nn.Conv2d(128, 128, 3),
+          nn.BatchNorm2d(128),
+          nn.ReLU(),    
+          nn.Conv2d(128, 256, 3, stride=2),
+          nn.Conv2d(256, 256, 3),
+          nn.Conv2d(256, 256, 3),
+          nn.BatchNorm2d(256),
+          nn.ReLU(),    
+          nn.Conv2d(256, 96, 1),
+          nn.BatchNorm2d(96),
+          nn.ReLU(),     
+        )
+    
+    def forward(self, data):
+        return self.model(data)
 
+class PoseRegressionGeo(nn.Sequential):
+  
+    def __init__(self):
+        super().__init__()
+        self.model = nn.Sequential(
+          nn.Linear(192, 96),
+          nn.BatchNorm1d(96),
+          nn.Linear(96, 96),
+          nn.BatchNorm1d(96),
+          nn.ReLU(),
+#          nn.Linear(42, 21),
+#          nn.BatchNorm1d(21),
+          nn.Linear(96, 21),
+          nn.BatchNorm1d(21),
+          nn.Tanh()
+        )
+    
+    def forward(self, data):
+        return self.model(data)
     
 class FeatureNet2D(nn.Sequential):
     def __init__(self):
