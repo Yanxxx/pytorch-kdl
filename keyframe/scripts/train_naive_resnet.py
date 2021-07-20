@@ -13,26 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from dataset import dataset
-from attention_autograd import Attention
+from attention import NaiveAttentionResnet
 import utils as utils
 import datetime
 import torch
 import torch.nn as nn
 from os import mkdir, getcwd
 from os.path import join, dirname
+from torch.utils.tensorboard import SummaryWriter
 
 
 def main():
-    device = utils.selectDevice(1)
+    device = utils.selectDevice(0)
     
     rot, t = utils.camTrans()
     
-    model = Attention(rot.to(device), t.to(device), 480, 640).to(device)
+    model = NaiveAttentionResnet().to(device)
     # preparing dataset
     print('preparing dataset')
     data_path = '/workspace/datasets/block-insertion-test/'    
     print('loading train dataset.')
-    training_set = dataset(data_path)#, [0, 0.02])
+    training_set = dataset(data_path)#, [0, 0.1])
     print('loading validate dataset.')
     validating_set = dataset(data_path, [0.75, 1])
         
@@ -66,8 +67,11 @@ def main():
     curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     model_path = join(dirname(getcwd()), 'checkpoints', curr_time)
     mkdir(model_path)
-    loss_path = join(dirname(getcwd()), 'loss', curr_time)
+    loss_path = join(dirname(getcwd()), '../', 'loss', curr_time)
     mkdir(loss_path)
+    
+    writer = SummaryWriter('../logs/fashion_mnist_experiment_1')
+    writer.add_graph(model)
     for epoch in range(max_epochs):
         
         model.train()
@@ -75,7 +79,7 @@ def main():
             data = data.to(device)
             depth = depth.to(device)            
             gt = gt.to(device)
-            ps = model(data, depth)         
+            ps = model(data)         
             loss = criterion(ps, gt)       
             optimizer.zero_grad()
             loss.backward()            
@@ -89,7 +93,7 @@ def main():
             depth = depth.to(device)
             gt = gt.to(device)  
 #            print('validate ', gt.shape)
-            ps = model(data, depth)   
+            ps = model(data)   
             loss = criterion(ps, gt)
 #            print('validate ps ', ps.shape)
             vl = loss.item()
@@ -98,17 +102,18 @@ def main():
         if epoch % 1000 == 0:
             saved_model = 'checkpoint-{}.pth'.format(epoch)
             torch.save(checkpoint, join(getcwd(), model_path, saved_model))
-            with open(join(getcwd(), '../', loss_path, 'geo-train-loss.txt'), 'a') as f:
+            with open(join(getcwd(), '../',loss_path, 'navie-train-loss.txt'), 'a') as f:
                 f.write('\n')
                 f.write("\n".join(map(str, loss_val)))
             loss_val = []
-            with open(join(getcwd(), '../', loss_path, 'geo-validate-loss.txt'), 'a') as f:
+            with open(join(getcwd(), '../', loss_path, 'navie-validate-loss.txt'), 'a') as f:
                 f.write('\n')
                 f.write("\n".join(map(str, valid_loss)))
                 valid_loss = []
             
         print('epoch: ', epoch, ', train-loss: ', tl, 'validate-loss', vl)
         scheduler.step()
+    writer.close()
 
             
 if __name__ == '__main__':

@@ -16,11 +16,13 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.parameter import Parameter
 import numpy as np
 
     
-class FeatureNet(nn.Sequential):
-    def __init__(self):
+class NaiveCNN(nn.Sequential):
+    
+    def __init__(self, input_channel=4, output_channel=32):
         super().__init__()
         self.model = nn.Sequential(
           nn.Conv2d(4, 32, 3),
@@ -38,124 +40,29 @@ class FeatureNet(nn.Sequential):
           nn.Conv2d(256, 256, 3),
           nn.BatchNorm2d(256),
           nn.ReLU(),    
-          nn.Conv2d(256, 16, 1),
-          nn.BatchNorm2d(16),
+          nn.Conv2d(256, output_channel, 1),
+          nn.BatchNorm2d(output_channel),
           nn.ReLU(),     
         )
     
     def forward(self, data):
         return self.model(data)
+
+class PoseRegress(nn.Sequential):
     
-    
-class PoseRegression(nn.Sequential):
-  
-    def __init__(self):
+    def __init__(self, input_neurons=96, output_neurons=7):
         super().__init__()
         self.model = nn.Sequential(
-          nn.Linear(48, 96),
+          nn.Linear(input_neurons, 96),
           nn.BatchNorm1d(96),
           nn.Linear(96, 48),
           nn.BatchNorm1d(48),
           nn.ReLU(),
 #          nn.Linear(42, 21),
 #          nn.BatchNorm1d(21),
-          nn.Linear(48, 7),
-          nn.BatchNorm1d(7),
+          nn.Linear(48, output_neurons),
           nn.Tanh()
-        )
-    
-    def forward(self, data):
-        return self.model(data)
-
-class FeatureNetGeo(nn.Sequential):
-    def __init__(self):
-        super().__init__()
-        self.model = nn.Sequential(
-          nn.Conv2d(4, 32, 3),
-          nn.Conv2d(32, 32, 3),
-          nn.Conv2d(32, 32, 3),
-          nn.BatchNorm2d(32),
-          nn.ReLU(),
-          nn.Conv2d(32, 64, 3, stride=2),
-          nn.Conv2d(64, 128, 3),
-          nn.Conv2d(128, 128, 3),
-          nn.BatchNorm2d(128),
-          nn.ReLU(),    
-          nn.Conv2d(128, 256, 3, stride=2),
-          nn.Conv2d(256, 256, 3),
-          nn.Conv2d(256, 256, 3),
-          nn.BatchNorm2d(256),
-          nn.ReLU(),    
-          nn.Conv2d(256, 96, 1),
-          nn.BatchNorm2d(96),
-          nn.ReLU(),     
-        )
-    
-    def forward(self, data):
-        return self.model(data)
-
-class PoseRegressionGeo(nn.Sequential):
-  
-    def __init__(self):
-        super().__init__()
-        self.model = nn.Sequential(
-          nn.Linear(288, 96),
-          nn.BatchNorm1d(96),
-          nn.Linear(96, 96),
-          nn.BatchNorm1d(96),
-          nn.ReLU(),
-#          nn.Linear(42, 21),
-#          nn.BatchNorm1d(21),
-          nn.Linear(96, 21),
-          nn.BatchNorm1d(21),
-          nn.Tanh()
-        )
-    
-    def forward(self, data):
-        return self.model(data)
-    
-class FeatureNet2D(nn.Sequential):
-    def __init__(self):
-        super().__init__()
-        self.model = nn.Sequential(
-          nn.Conv2d(3, 32, 3),
-          nn.Conv2d(32, 32, 3),
-          nn.Conv2d(32, 32, 3),
-          nn.BatchNorm2d(32),
-          nn.ReLU(),
-          nn.Conv2d(32, 64, 3, stride=2),
-          nn.Conv2d(64, 128, 3),
-          nn.Conv2d(128, 128, 3),
-          nn.BatchNorm2d(128),
-          nn.ReLU(),    
-          nn.Conv2d(128, 256, 3, stride=2),
-          nn.Conv2d(256, 256, 3),
-          nn.Conv2d(256, 256, 3),
-          nn.BatchNorm2d(256),
-          nn.ReLU(),    
-          nn.Conv2d(256, 96, 1),
-          nn.BatchNorm2d(96),
-          nn.ReLU(),     
-        )
-    
-    def forward(self, data):
-        return self.model(data)
-    
-class PoseRegression2D(nn.Sequential):
-  
-    def __init__(self):
-        super().__init__()
-        self.model = nn.Sequential(
-          nn.Linear(192, 96),
-          nn.BatchNorm1d(96),
-          nn.ReLU(),
-#          nn.Linear(42, 21),
-#          nn.BatchNorm1d(21),
-          nn.Linear(96, 21),
-          nn.BatchNorm1d(21),
-          nn.Tanh()
-        )
-    
+                )
     def forward(self, data):
         return self.model(data)
 
@@ -212,7 +119,6 @@ class PoseRegressionNaive(nn.Sequential):
 #          nn.Linear(42, 21),
 #          nn.BatchNorm1d(21),
           nn.Linear(48, 21),
-          nn.BatchNorm1d(21),
           nn.Tanh()
         )
     

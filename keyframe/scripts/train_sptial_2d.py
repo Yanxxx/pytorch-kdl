@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from dataset import dataset
-from PointAttension2D import PointAttension2D
+from Attension import Attension2D
 import utils as utils
 import datetime
 import torch
@@ -27,7 +27,7 @@ def main():
     
     rot, t = utils.camTrans()
     
-    model = PointAttension2D().to(device)
+    model = Attension2D().to(device)
     # preparing dataset
     print('preparing dataset')
     data_path = '/workspace/datasets/block-insertion-test/'    

@@ -25,7 +25,7 @@ import torch.nn.functional as F
 import torch.nn as nn
 from torch.nn.parameter import Parameter
 import numpy as np
-import tmp_utils as utils
+import utils as utils
 
 
 class ExtendedSpatialSoftmax(nn.Module):
@@ -50,10 +50,14 @@ class ExtendedSpatialSoftmax(nn.Module):
         pos_x = torch.from_numpy(pos_x).float()
         pos_y = torch.from_numpy(pos_y).float()
         homo_z = torch.from_numpy(homo_z).float()
-#        pos_x = torch.from_numpy(pos_x.reshape(self.height*self.width)).float()
-#        pos_y = torch.from_numpy(pos_y.reshape(self.height*self.width)).float()
+        homo_x = pos_x.clone()
+        homo_y = pos_y.clone()
+        pos_x = torch.from_numpy(pos_x.reshape(self.height*self.width)).float()
+        pos_y = torch.from_numpy(pos_y.reshape(self.height*self.width)).float()
         self.register_buffer('pos_x', pos_x)
         self.register_buffer('pos_y', pos_y)
+        self.register_buffer('homo_x', homo_x)
+        self.register_buffer('homo_y', homo_y)
         self.register_buffer('homo_z', homo_z)
 
     def forward(self, feature):
