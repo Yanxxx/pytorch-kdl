@@ -25,7 +25,7 @@ class NaiveCNN(nn.Sequential):
     def __init__(self, input_channel=4, output_channel=32):
         super().__init__()
         self.model = nn.Sequential(
-          nn.Conv2d(4, 32, 3),
+          nn.Conv2d(3, 32, 3),
           nn.Conv2d(32, 32, 3),
           nn.Conv2d(32, 32, 3),
           nn.BatchNorm2d(32),

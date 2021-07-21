@@ -59,9 +59,9 @@ from submodules import NaiveCNN, PoseRegress, SpatialSoftmax
     
 
 
-class Attension2D(nn.Module):
+class Attention2D(nn.Module):
     def __init__(self, spatial_height=31, spatial_weight=21, spatial_channel=96):
-        super(Attension2D, self).__init__()
+        super(Attention2D, self).__init__()
         self.feature = NaiveCNN(input_channel=3, output_channel=96)
         self.extended_spatial_softmax = SpatialSoftmax(spatial_height,
                                                        spatial_weight,

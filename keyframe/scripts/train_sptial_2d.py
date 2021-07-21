@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from dataset import dataset
-from Attension import Attension2D
+from attention import Attention2D
 import utils as utils
 import datetime
 import torch
@@ -27,7 +27,7 @@ def main():
     
     rot, t = utils.camTrans()
     
-    model = Attension2D().to(device)
+    model = Attention2D().to(device)
     # preparing dataset
     print('preparing dataset')
     data_path = '/workspace/datasets/block-insertion-test/'    
@@ -66,7 +66,7 @@ def main():
     curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     model_path = join(dirname(getcwd()), 'checkpoints', curr_time)
     mkdir(model_path)
-    loss_path = join(dirname(getcwd()), '../', 'loss', curr_time)
+    loss_path = join(dirname(getcwd()), 'loss', curr_time)
     mkdir(loss_path)
     for epoch in range(max_epochs):
         
@@ -109,7 +109,7 @@ def main():
                 f.write("\n".join(map(str, valid_loss)))
                 valid_loss = []
             
-        print('epoch: ', epoch, ', train-loss: ', tl, 'validate-loss', vl)
+        print('epoch: ', epoch, ', train-loss: ', tl, 'validate-loss: ', vl)
         scheduler.step()
 
             

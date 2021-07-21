@@ -67,7 +67,7 @@ def main():
     curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     model_path = join(dirname(getcwd()), 'checkpoints', curr_time)
     mkdir(model_path)
-    loss_path = join(dirname(getcwd()), '../', 'loss', curr_time)
+    loss_path = join(dirname(getcwd()), 'loss', curr_time)
     mkdir(loss_path)
     
     writer = SummaryWriter('../logs/fashion_mnist_experiment_1')
