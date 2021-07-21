@@ -28,7 +28,7 @@ def main():
     
     rot, t = utils.camTrans()
     
-    model = NaiveAttention().to(device)
+    model = NaiveAttention(3,16).to(device)
     # preparing dataset
     print('preparing dataset')
     data_path = '/workspace/datasets/block-insertion-test/'    
