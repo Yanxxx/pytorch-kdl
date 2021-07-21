@@ -81,7 +81,7 @@ class NaiveAttention(nn.Module):
 
     def __init__(self):
         super(NaiveAttention, self).__init__()
-        self.feature = NaiveCNN(input_channel=3, output_channel=16)
+        self.feature = NaiveCNN(input_channel=4, output_channel=16)
         self.pose_regress = PoseRegress(10416, 21)
               
     def forward(self, data):
