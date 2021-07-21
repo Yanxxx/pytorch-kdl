@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import torch.nn as nn
-from submodules import NaiveCNN, PoseRegress
+from submodules import NaiveCNND, PoseRegress
 from extended_spatial_softmax_ import ExtendedSpatialSoftmax, Transformation
 
 
@@ -27,7 +27,7 @@ class Attention(nn.Module):
                  spatial_height=31, 
                  spatial_weight=21, spatial_channel=96):
         super(Attention, self).__init__()
-        self.feature = NaiveCNN(input_channel=4, output_channel=spatial_channel)
+        self.feature = NaiveCNND(input_channel=4, output_channel=spatial_channel)
 #        self.extended_spatial_max = ExtendedSpatialSoftargMax(31,21,196)
 #        self.extended_spatial_max = ExtendedSpatialSoftargMax(spatial_height, 
 #                                                              spatial_weight, 

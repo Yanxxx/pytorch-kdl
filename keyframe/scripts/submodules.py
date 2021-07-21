@@ -47,6 +47,34 @@ class NaiveCNN(nn.Sequential):
     
     def forward(self, data):
         return self.model(data)
+    
+class NaiveCNND(nn.Sequential):
+    
+    def __init__(self, input_channel=4, output_channel=32):
+        super().__init__()
+        self.model = nn.Sequential(
+          nn.Conv2d(4, 32, 3),
+          nn.Conv2d(32, 32, 3),
+          nn.Conv2d(32, 32, 3),
+          nn.BatchNorm2d(32),
+          nn.ReLU(),
+          nn.Conv2d(32, 64, 3, stride=2),
+          nn.Conv2d(64, 128, 3),
+          nn.Conv2d(128, 128, 3),
+          nn.BatchNorm2d(128),
+          nn.ReLU(),    
+          nn.Conv2d(128, 256, 3, stride=2),
+          nn.Conv2d(256, 256, 3),
+          nn.Conv2d(256, 256, 3),
+          nn.BatchNorm2d(256),
+          nn.ReLU(),    
+          nn.Conv2d(256, output_channel, 1),
+          nn.BatchNorm2d(output_channel),
+          nn.ReLU(),     
+        )
+    
+    def forward(self, data):
+        return self.model(data)
 
 class PoseRegress(nn.Sequential):
     

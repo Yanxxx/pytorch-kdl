@@ -69,7 +69,6 @@ def main():
     loss_path = join(dirname(getcwd()), 'loss', curr_time)
     mkdir(loss_path)
     for epoch in range(max_epochs):
-        
         model.train()
         for data, depth, gt in train_generator:
             data = data.to(device)
@@ -107,7 +106,7 @@ def main():
                 f.write("\n".join(map(str, valid_loss)))
                 valid_loss = []
             
-        print('epoch: ', epoch, ', train-loss: ', tl, 'validate-loss', vl)
+        print('epoch: ', epoch, ', train-loss: ', tl, 'validate-loss: ', vl)
         scheduler.step()
 
             
