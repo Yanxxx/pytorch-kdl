@@ -29,6 +29,11 @@ def main():
     rot, t = utils.camTrans()
     
     model = NaiveAttentionResnet().to(device)
+    
+    if not model:
+        print('model init failed!')
+        return 
+    
     # preparing dataset
     print('preparing dataset')
     data_path = '/workspace/datasets/block-insertion-test/'    
