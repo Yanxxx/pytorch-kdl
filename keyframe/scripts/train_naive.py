@@ -70,8 +70,8 @@ def main():
     loss_path = join(dirname(getcwd()), 'loss', curr_time)
     mkdir(loss_path)
     
-    writer = SummaryWriter('../logs/fashion_mnist_experiment_1')
-    writer.add_graph(model)
+#    writer = SummaryWriter('../logs/fashion_mnist_experiment_1')
+#    writer.add_graph(model)
     for epoch in range(max_epochs):
         
         model.train()
@@ -113,7 +113,7 @@ def main():
             
         print('epoch: ', epoch, ', train-loss: ', tl, 'validate-loss', vl)
         scheduler.step()
-    writer.close()
+#    writer.close()
 
             
 if __name__ == '__main__':
