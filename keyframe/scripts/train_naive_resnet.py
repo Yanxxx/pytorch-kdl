@@ -107,11 +107,11 @@ def main():
         if epoch % 1000 == 0:
             saved_model = 'checkpoint-{}.pth'.format(epoch)
             torch.save(checkpoint, join(getcwd(), model_path, saved_model))
-            with open(join(getcwd(), '../',loss_path, 'navie-train-loss.txt'), 'a') as f:
+            with open(join(getcwd(), '../',loss_path, 'navie-resnet-train-loss.txt'), 'a') as f:
                 f.write('\n')
                 f.write("\n".join(map(str, loss_val)))
             loss_val = []
-            with open(join(getcwd(), '../', loss_path, 'navie-validate-loss.txt'), 'a') as f:
+            with open(join(getcwd(), '../', loss_path, 'navie-resnet-validate-loss.txt'), 'a') as f:
                 f.write('\n')
                 f.write("\n".join(map(str, valid_loss)))
                 valid_loss = []

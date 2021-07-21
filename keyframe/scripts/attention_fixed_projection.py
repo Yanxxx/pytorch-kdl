@@ -18,7 +18,6 @@ from submodules import NaiveCNND, PoseRegress
 from extended_spatial_softmax_ import ExtendedSpatialSoftmax, Transformation
 
 
-
 class Attention(nn.Module):
     def __init__(self, rotation, translation, 
                  image_height,
