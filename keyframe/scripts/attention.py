@@ -107,4 +107,3 @@ class NaiveAttentionResnet(nn.Module):
         data = data.view(-1, data.shape[1] * data.shape[2] * data.shape[3])
         output = self.l1(data)
         return output
-        

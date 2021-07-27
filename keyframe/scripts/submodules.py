@@ -153,3 +153,29 @@ class PoseRegressionNaive(nn.Sequential):
     def forward(self, data):
         data = data.view(-1, data.shape[1] * data.shape[2] * data.shape[3])
         return self.model(data)
+ 
+class CoordinateTransformer(nn.Module):
+    
+    def __init__(self, height, width):
+        super(CoordinateTransformer).__init__()
+        
+        pos_x, pos_y = np.meshgrid(
+                np.linspace(-1., 1., self.height),
+                np.linspace(-1., 1., self.width)
+                )
+        pos_x = torch.Tensor(pos_x).float()
+        pos_y = torch.Tensor(pos_y).float()
+        self.register_buffer('pos_x', pos_x)
+        self.register_buffer('pos_y', pos_y)
+        self.xy = torch.cat((pos_x[None,:], pos_y[None, :]), 0)
+        self.ones = torch.ones(height, width)
+        self.l1 = nn.Conv2d(2, 2, 1)
+        self.l2 = nn.Conv2d(3, 3, 1)
+        
+    def forward(self, depth):
+        output = self.l1(self.xy)
+        output = torch.cat((output, self.ones[None, :]), 0)
+        output = output * depth
+        output = self.l2(output)
+        return output
+        

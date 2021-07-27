@@ -123,7 +123,7 @@ class SpatialProjection(torch.autograd.Function):
     
 
 class Transformation(torch.autograd.Function):
-    
+
     @staticmethod
     def forward(ctx, data, batch_size, channel, rotation, translation, ri, ti):
 #        print('Transformation network input: ', data.shape)
