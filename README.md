@@ -1,4 +1,4 @@
-# PyTorch-KDL: A Kinematics and Dynamics Library for Robotic Learning
+# PyTorch-KDL-DOCKER: A Kinematics and Dynamics Library for Robotic Learning
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Status](https://img.shields.io/badge/status-experimental-orange)
