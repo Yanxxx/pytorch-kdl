@@ -3,6 +3,8 @@
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Status](https://img.shields.io/badge/status-experimental-orange)
 ![Docker](https://img.shields.io/badge/Docker-ready-blue?logo=docker)
+![Platform](https://img.shields.io/badge/Ubuntu-22.04-orange)
+![Python version](https://img.shields.io/badge/python-3.8+-informational)
 
 This project provides a powerful integration of **PyTorch** and the **Orocos Kinematics and Dynamics Library (KDL)**, all conveniently packaged within a Docker container. It is designed for researchers and developers working on robot kinematics, manipulation, and vision-based task training.
 
