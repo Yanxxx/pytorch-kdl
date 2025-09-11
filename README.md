@@ -1,7 +1,6 @@
 # PyTorch-KDL-DOCKER: A Kinematics and Dynamics Library for Robotic Learning
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Status](https://img.shields.io/badge/status-experimental-orange)
 ![Docker](https://img.shields.io/badge/Docker-ready-blue?logo=docker)
 ![Platform](https://img.shields.io/badge/Ubuntu-22.04-orange)
 ![Python version](https://img.shields.io/badge/python-3.8+-informational)
